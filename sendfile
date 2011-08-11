@@ -1,0 +1,161 @@
+#! /usr/bin/env python
+
+import sys, getopt, socket 
+
+def main(argv):
+    """Parse command line arguements to transfer file"""
+    #Attempt to parse command line args, catch error
+    try:
+        opts, args = getopt.getopt(argv, "a:f:hp:svw", ["address=", "file=", "help", "port=", "send", "verbose", "wait"])
+    except getopt.GetoptError:
+        error("Incorrect arguements")
+
+    #Parse getopt opt, arg tuples to a dictionary
+    arg_dict = dict(opts)     
+
+    #Store whether the command should be verbose
+    global verbose_bool
+    verbose_bool = "-v" in arg_dict.keys() or "--verbose" in arg_dict.keys()
+    
+    #Test for presence of a wait and/or send flag
+    wait_bool = "-w" in arg_dict.keys() or "--wait" in arg_dict.keys()
+    send_bool = "-s" in arg_dict.keys() or "--send" in arg_dict.keys()
+
+    #Resolve script action from flags
+    if wait_bool and send_bool:
+        error("Cannot wait and send.")
+    elif wait_bool:
+        #Wait on the specified port
+        if "-p" in arg_dict.keys():
+            wait(arg_dict["-p"])
+        elif "--port" in arg_dict.keys():
+            wait(arg_dict["--port"])
+        else:
+            error("Must specify port to wait on")
+    elif send_bool:
+        #Retrieve the target address
+        if "-a" in arg_dict.keys():
+            address = arg_dict["-a"]
+        elif "--address" in arg_dict.keys():      
+            address = arg_dict["--address"]
+        else:
+            error("Must specify address to send to.")
+
+        #Retrive port to transfer on
+        if "-p" in arg_dict.keys():
+            port = arg_dict["-p"]
+        elif "--port" in arg_dict.keys():
+            port = arg_dict["--port"]
+        else:
+            error("Must specify port to transfer on")
+
+        #Retrieve the filename
+        if "-f" in arg_dict.keys():
+            filename = arg_dict["-f"]
+        elif "--file" in arg_dict.keys():
+            filename = arg_dict["--file"]
+        else:
+            error("Must specify file to send")
+
+        #Send the file to the adress
+        send(address, port, filename)
+    elif "-h" in arg_dict.keys() or "--help" in arg_dict.keys():
+        #Display usage and exit
+        usage()
+        sys.exit(2)
+    else:
+        error("Must send, wait, or help") 
+
+def wait(port):
+    """Wait for a transfer on specified port"""
+
+    print "Waiting for connection on port", port + "..."
+
+    #Establish server socket
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #Set up server socket
+    server.bind(('', int(port))) #Bind socket to specified port
+    server.listen(1) #Listen for up to 1 connection on bound port
+    connection, address = server.accept() #On connection accept, store new connection and address
+    print "Connected to address", address
+
+    #Recieve the data
+    if verbose_bool: print "\nRecieving data"
+    while True:
+        data = connection.recv(1024)
+        if not data:
+            if verbose_bool: print "Error, no data received"
+            connection.close()
+            sys.exit(2)
+        break
+    if verbose_bool: print "Data recieved"
+
+    #if verbose_bool: print data
+
+    #Seperate filename and file content via delimeter
+    delim_index = data.find("///")
+    delim_end = delim_index + 3
+    filename = data[:delim_index]
+    file_content = data[delim_end:]
+
+    #Save file
+    if verbose_bool: print "\nSaving file", filename
+    f = open(filename, "w")
+    f.write(file_content)
+    f.close()
+    print "File", filename, "saved" 
+
+    #Close connection"
+    if verbose_bool: print "\nClosing connection"
+    connection.close()
+
+def send(address, port, filename):
+    """Send a file to an address on specified port"""
+
+    print "Establishing connection on port", port
+
+    #Establish client socket
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #Set up client socket
+    client.connect((address, int(port)))
+    print "Connection established"
+
+    #Read in file
+    if verbose_bool: print "\nReading file"
+    f = open(filename, "r")
+    file_content = f.read()
+    f.close()         
+    if verbose_bool: print "File read"
+
+    #Format data for sending
+    data = filename + "///" + file_content
+
+    #Send data
+    if verbose_bool: print "\nSending", filename
+    client.send(data)
+    print "Sent", filename
+
+    #Close client connection
+    if verbose_bool: print "\nClosing connection"
+    client.close()
+
+def error(msg):
+    """Print an error message and usage, then quit"""
+    print msg, "\n"
+    usage()
+    sys.exit(2)   
+
+def usage():
+    """Print script usage"""
+    print "Usage: sendfile [OPTION] ..."
+    print "Sends a file to another sendfile user on the other end."
+    print ""
+    print "-a, --address    The adress to send to "
+    print "-f, --file       Filename to send"
+    print "-h, --help       Print this usage and quit"
+    print "-p, --port       The port to send or wait on"
+    print "-s, --send       Flag telling sendfile to send"
+    print "-w, --wait       Flag telling sendfile to wait"
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
+
+
