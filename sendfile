@@ -89,8 +89,6 @@ def wait(port):
         break
     if verbose_bool: print "Data recieved"
 
-    #if verbose_bool: print data
-
     #Seperate filename and file content via delimeter
     delim_index = data.find("///")
     delim_end = delim_index + 3

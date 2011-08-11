@@ -1,0 +1,56 @@
+sendfile
+
+Author: Jordan Goldstein
+E-mail: mr.jordangoldstein@gmail.com
+
+
+
+Requirements
+---
+Tested on Ubuntu Linux, compatibility with other operating systems unknown.
+Additionally, you should know that sendfile has a MAX FILE SIZE OF 1KB.
+
+
+
+Installing
+---
+To prepare sendfile for use, you must make it executable:
+
+$ chmod +x sendfile
+
+Additionally, you may want to add it to your path.
+This README will assume you have.
+
+
+
+Using sendfile
+---
+Receiving a file:
+
+To recieve a file, you must instruct sendfile to wait
+for a connection on a certain port. For example, to wait 
+on port 5000, you would, in a terminal, enter either:
+
+$ sendfile --wait --port 5000
+or
+$ sendfile -w -p 5000
+
+
+Sending a file:
+
+To send a file, you must instruct sendfile to send
+a certain filename to a specified address and port.
+For example, to send a file named example.txt to 
+address 127.0.0.1 on port 5000, you would, in
+a terminal, enter either:
+
+$ sendfile --send --file example.txt --address 127.0.0.1 --port 5000 
+or
+$ sendfile -s -f example.txt -a 127.0.0.1 -p 5000
+
+
+Miscellaneous
+---
+To get verbose output when sending or recieving files,
+use the -v or --verbose flag. This will give you step
+by step output of the transfer process.
