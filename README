@@ -1,4 +1,4 @@
-sendfile
+pysendfile
 
 Author: Jordan Goldstein
 E-mail: mr.jordangoldstein@gmail.com
@@ -8,45 +8,45 @@ E-mail: mr.jordangoldstein@gmail.com
 Requirements
 ---
 Tested on Ubuntu Linux, compatibility with other operating systems unknown.
-Additionally, you should know that sendfile has a MAX FILE SIZE OF 1KB.
+Additionally, you should know that pysendfile has a MAX FILE SIZE OF 1KB.
 
 
 
 Installing
 ---
-To prepare sendfile for use, you must make it executable:
+To prepare pysendfile for use, you must make it executable:
 
-$ chmod +x sendfile
+$ chmod +x pysendfile
 
 Additionally, you may want to add it to your path.
 This README will assume you have.
 
 
 
-Using sendfile
+Using pysendfile
 ---
 Receiving a file:
 
-To recieve a file, you must instruct sendfile to wait
+To recieve a file, you must instruct pysendfile to wait
 for a connection on a certain port. For example, to wait 
 on port 5000, you would, in a terminal, enter either:
 
-$ sendfile --wait --port 5000
+$ pysendfile --wait --port 5000
 or
-$ sendfile -w -p 5000
+$ pysendfile -w -p 5000
 
 
 Sending a file:
 
-To send a file, you must instruct sendfile to send
+To send a file, you must instruct pysendfile to send
 a certain filename to a specified address and port.
 For example, to send a file named example.txt to 
 address 127.0.0.1 on port 5000, you would, in
 a terminal, enter either:
 
-$ sendfile --send --file example.txt --address 127.0.0.1 --port 5000 
+$ pysendfile --send --file example.txt --address 127.0.0.1 --port 5000 
 or
-$ sendfile -s -f example.txt -a 127.0.0.1 -p 5000
+$ pysendfile -s -f example.txt -a 127.0.0.1 -p 5000
 
 
 Miscellaneous

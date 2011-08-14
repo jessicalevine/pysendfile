@@ -6,60 +6,49 @@ def main(argv):
     """Parse command line arguements to transfer file"""
     #Attempt to parse command line args, catch error
     try:
-        opts, args = getopt.getopt(argv, "a:f:hp:svw", ["address=", "file=", "help", "port=", "send", "verbose", "wait"])
+        options, arguements = getopt.getopt(argv, "a:f:hp:svw", ["address=", "file=", "help", "port=", "send", "verbose", "wait"])
     except getopt.GetoptError:
         error("Incorrect arguements")
 
-    #Parse getopt opt, arg tuples to a dictionary
-    arg_dict = dict(opts)     
+    #Parse getopt option, arguement tuples to a dictionary
+    args = dict(options)     
 
     #Store whether the command should be verbose
     global verbose_bool
-    verbose_bool = "-v" in arg_dict.keys() or "--verbose" in arg_dict.keys()
+    verbose_bool = "-v" in args.keys() or "--verbose" in args.keys()
     
     #Test for presence of a wait and/or send flag
-    wait_bool = "-w" in arg_dict.keys() or "--wait" in arg_dict.keys()
-    send_bool = "-s" in arg_dict.keys() or "--send" in arg_dict.keys()
+    wait_bool = "-w" in args.keys() or "--wait" in args.keys()
+    send_bool = "-s" in args.keys() or "--send" in args.keys()
 
     #Resolve script action from flags
     if wait_bool and send_bool:
         error("Cannot wait and send.")
     elif wait_bool:
         #Wait on the specified port
-        if "-p" in arg_dict.keys():
-            wait(arg_dict["-p"])
-        elif "--port" in arg_dict.keys():
-            wait(arg_dict["--port"])
-        else:
+        port = args.get("-p") or args.get("--port")  
+        if port is None:
             error("Must specify port to wait on")
+        wait(port)
     elif send_bool:
         #Retrieve the target address
-        if "-a" in arg_dict.keys():
-            address = arg_dict["-a"]
-        elif "--address" in arg_dict.keys():      
-            address = arg_dict["--address"]
-        else:
+        address = args.get("-a") or args.get("--address")
+        if address is None:
             error("Must specify address to send to.")
 
         #Retrive port to transfer on
-        if "-p" in arg_dict.keys():
-            port = arg_dict["-p"]
-        elif "--port" in arg_dict.keys():
-            port = arg_dict["--port"]
-        else:
+        port = args.get("-p") or args.get("--port")
+        if port is None:
             error("Must specify port to transfer on")
 
         #Retrieve the filename
-        if "-f" in arg_dict.keys():
-            filename = arg_dict["-f"]
-        elif "--file" in arg_dict.keys():
-            filename = arg_dict["--file"]
-        else:
+        filename = args.get("-f") or args.get("--file")
+        if filename is None:
             error("Must specify file to send")
 
         #Send the file to the adress
         send(address, port, filename)
-    elif "-h" in arg_dict.keys() or "--help" in arg_dict.keys():
+    elif "-h" in args.keys() or "--help" in args.keys():
         #Display usage and exit
         usage()
         sys.exit(2)
