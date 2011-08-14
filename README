@@ -7,8 +7,8 @@ E-mail: mr.jordangoldstein@gmail.com
 
 Requirements
 ---
-Tested on Ubuntu Linux, compatibility with other operating systems unknown.
-Additionally, you should know that pysendfile has a MAX FILE SIZE OF 1KB.
+Tested on Ubuntu Linux and Microsoft Windows 7 (using Cygwin).
+Compatibility with other operating systems unknown.
 
 
 
